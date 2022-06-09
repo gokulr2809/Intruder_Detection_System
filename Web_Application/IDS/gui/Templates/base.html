@@ -1,0 +1,145 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <script src="https://code.jquery.com/jquery.min.js"></script>
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <title>Smart Home</title>
+</head>
+<body style="background-color: #182446;">
+
+  {% block content %}
+  {% endblock %}
+  
+<script>
+      document.addEventListener("DOMContentLoaded", function() {
+          var btn = document.getElementById("set");
+          btn.addEventListener("click", function() {
+              var myModal = new bootstrap.Modal(document.getElementById("myModal"));
+              myModal.show();
+          });
+      });
+
+      function alarm()
+            {
+            let timebtn = document.querySelector("#time");
+            let setbtn = document.querySelector("#set");
+            let notf = document.querySelector("#alarmnot");
+            notf.innerHTML="The Alarm is Set";
+            timebtn.disabled = true;
+            setbtn.setAttribute("class","btn btn-danger w-50 my-3");
+            setbtn.setAttribute("onclick","alarmoff()");
+            setbtn.innerHTML="Cancel";
+
+            let inputValue = document.getElementById("time").value;
+            console.log(inputValue);
+            var request = $.ajax({
+                url : "alarm",
+                type : "POST",
+                data : {
+                  "time": inputValue,
+                  csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+            });
+            } 
+
+          function alarmoff()
+            {
+            let timebtn = document.querySelector("#time");
+            let setbtn = document.querySelector("#set");
+            let notf = document.querySelector("#alarmnot");
+            notf.innerHTML="The Alarm is Removed";
+            console.log("off");
+            timebtn.disabled = false;
+            setbtn.setAttribute("class","btn btn-primary w-50 my-3");
+            setbtn.setAttribute("onclick","alarm()");
+
+            setbtn.innerHTML="Set";
+            var request = $.ajax({
+                url : "alarm",
+                type : "POST",
+                data : {
+                  "time": "off",
+                  csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+            });
+            }
+            $('#myModal').on('shown.bs.modal', function () {
+            $('#myInput').trigger('focus')})  
+
+            function led() {
+              let inputValue = document.getElementById("led").checked;
+              console.log(inputValue)
+              var request = $.ajax({
+                url : "led",
+                type : "POST",
+                data : {
+                  "led": inputValue,
+                  csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+            });
+            }
+
+            function ids() {
+              let inputValue = document.getElementById("ids").checked;
+              console.log(inputValue)
+              var request = $.ajax({
+                url : "ids",
+                type : "POST",
+                data : {
+                  "ids": inputValue,
+                  csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+            });
+            }
+
+            function stream() {
+            let setbtn = document.querySelector("#watch");
+            setbtn.setAttribute("class","btn btn-danger w-50 my-3");
+            setbtn.setAttribute("onclick","streamoff()");
+            setbtn.innerHTML="Cancel";
+            let m = 1;
+            console.log(m)
+              var request = $.ajax({
+                url : "stream",
+                type : "POST",
+                data : {
+                  "stream": m,
+                  csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+            });
+            window.open("http://192.168.150.30:8000/index.html");
+            }
+
+            function streamoff() {
+            let setbtn = document.querySelector("#watch");
+            setbtn.setAttribute("class","btn btn-primary w-50 my-3");
+            setbtn.setAttribute("onclick","stream()");
+            setbtn.innerHTML="Watch";
+            let m = 0;
+              var request = $.ajax({
+                url : "stream",
+                type : "POST",
+                data : {
+                  "stream": m,
+                  csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+            });
+            var urls = "http://192.168.150.30:8000/kill_server"
+            var request = $.ajax({
+                url : urls,
+                type : "POST",
+            });
+            }
+</script>
+<script src="{% static 'script.js' %}"></script>
+<script src="{% static 'js/bootstrap.bundle.js' %}"></script> 
+</body>
+</html>
